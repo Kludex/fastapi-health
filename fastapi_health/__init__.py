@@ -1,5 +1,5 @@
 __version__ = "0.1.0"
 
-from fastapi_health.route import HealthRoute
+from fastapi_health.route import health
 
-__all__ = ["HealthRoute"]
+__all__ = ["health"]
