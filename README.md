@@ -42,6 +42,10 @@ app = FastAPI()
 app.add_api_route("/health", health([is_database_online]))
 ```
 
+The `/health` endpoint on the example can return two possible response status code:
+- 200 (Ok): conditions are satisfied.
+- 503 (Service Unavailable): at least one condition is false.
+
 ## License
 
 This project is licensed under the terms of the MIT license.
