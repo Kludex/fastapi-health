@@ -1,14 +1,25 @@
+from collections import ChainMap
 from inspect import Parameter, Signature
-from typing import Callable, List
+from typing import Any, Callable, Dict, List, Optional
 
-from fastapi import Depends, Response
+from fastapi import Depends
+from fastapi.responses import JSONResponse
 
 
-def health(conditions: List[Callable]):
-    def endpoint(**dependencies):
-        if all([dependency for dependency in dependencies.values()]):
-            return Response(status_code=200)
-        return Response(status_code=503)
+def health(
+    conditions: List[Callable[..., Any]],
+    *,
+    success_output: Optional[Dict[str, Any]] = None,
+    failure_output: Optional[Dict[str, Any]] = None,
+    success_status: int = 200,
+    failure_status: int = 503,
+):
+    async def endpoint(**dependencies):
+        values = [dependency for dependency in dependencies.values()]
+        output = dict(ChainMap(*filter(lambda x: isinstance(x, dict), values)))
+        if all(values):
+            return JSONResponse(success_output or output, status_code=success_status)
+        return JSONResponse(failure_output or output, status_code=failure_status)
 
     params = []
     for condition in conditions:
