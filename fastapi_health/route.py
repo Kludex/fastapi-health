@@ -1,13 +1,13 @@
 from collections import ChainMap
 from inspect import Parameter, Signature
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from fastapi import Depends
 from fastapi.responses import JSONResponse
 
 
 def health(
-    conditions: List[Callable[..., Any]],
+    conditions: List[Callable[..., Union[Dict[str, Any], bool]]],
     *,
     success_output: Optional[Dict[str, Any]] = None,
     failure_output: Optional[Dict[str, Any]] = None,

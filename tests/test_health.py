@@ -1,6 +1,3 @@
-from typing import Any, Callable, Dict
-
-import pytest
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
@@ -18,12 +15,29 @@ def test_single_condition():
         assert res.status_code == 200
 
 
+def test_multiple_condition():
+    def healthy():
+        return True
+
+    def also_healthy():
+        return True
+
+    app = FastAPI()
+    app.add_api_route("/health", health([healthy, also_healthy]))
+    with TestClient(app) as client:
+        res = client.get("/health")
+        assert res.status_code == 200
+
+
 def test_sick_condition():
     def sick():
         return False
 
+    def healthy():
+        return True
+
     app = FastAPI()
-    app.add_api_route("/health", health([sick]))
+    app.add_api_route("/health", health([sick, healthy]))
     with TestClient(app) as client:
         res = client.get("/health")
         assert res.status_code == 503
@@ -79,3 +93,21 @@ def test_concatenate_response():
         res = client.get("/health")
         assert res.status_code == 200
         assert res.json() == {"potato": "yes", "banana": "yes"}
+
+
+def test_hybrid():
+    def healthy_dict():
+        return True
+
+    def sick():
+        return False
+
+    def also_healthy_dict():
+        return {"banana": "yes"}
+
+    app = FastAPI()
+    app.add_api_route("/health", health([healthy_dict, also_healthy_dict, sick]))
+    with TestClient(app) as client:
+        res = client.get("/health")
+        assert res.status_code == 503
+        assert res.json() == {"banana": "yes"}

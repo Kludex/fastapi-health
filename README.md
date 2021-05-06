@@ -23,10 +23,10 @@ The goal of this package is to help you to implement the [Health Check API](http
 pip install fastapi-health
 ```
 
-## Usage
+## Quick Start
 
-Using this package, you can create the health check endpoint dynamically using different conditions. Each condition is a
-callable and you can even have dependencies inside of it.
+Create the health check endpoint dynamically using different conditions. Each condition is a
+callable, and you can even have dependencies inside of it:
 
 ```python
 from fastapi import FastAPI, Depends
@@ -42,9 +42,34 @@ app = FastAPI()
 app.add_api_route("/health", health([is_database_online]))
 ```
 
-The `/health` endpoint on the example can return two possible response status code:
-- 200 (Ok): conditions are satisfied.
-- 503 (Service Unavailable): at least one condition is false.
+## Advanced Usage
+
+The `health()` method receives the following parameters:
+- `conditions`: A list of callables that represents the conditions of our API, it can return either `bool` or a `dict`.
+- `success_output`: An optional dictionary that will be the content response of a success health call.
+- `failure_output`: An optional dictionary analogous to `success_output` for failure scenarios.
+- `success_status`: An integer that overwrites the default status (200) in case of success.
+- `failure_status`: An integer that overwrites the default status (503) in case of failure.
+
+It's important to notice that you can have a _peculiar_ behavior in case of hybrid return statements (`bool` and `dict`) on the conditions.
+For example:
+
+``` Python
+from fastapi import FastAPI
+from fastapi_health import health
+
+def healthy_condition():
+    return {"database": "online"}
+
+def sick_condition():
+    return False
+
+app = FastAPI()
+app.add_api_route("/health", health([healthy_condition, sick_condition]))
+```
+
+This will generate a response composed by the status being 503 (default `failure_status`), and a body with `{"database": "online"}`.
+It's not wrong, or a bug. It's meant to be like this.
 
 ## License
 
