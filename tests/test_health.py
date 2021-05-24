@@ -111,3 +111,56 @@ def test_hybrid():
         res = client.get("/health")
         assert res.status_code == 503
         assert res.json() == {"banana": "yes"}
+
+
+def test_success_handler():
+    async def success_handler(**kwargs):
+        return kwargs
+
+    def healthy():
+        return True
+
+    def another_healthy():
+        return True
+
+    app = FastAPI()
+    app.add_api_route(
+        "/health", health([healthy, another_healthy], success_handler=success_handler)
+    )
+    with TestClient(app) as client:
+        res = client.get("/health")
+        assert res.status_code == 200
+        assert res.json() == {"healthy": True, "another_healthy": True}
+
+
+def test_custom_output():
+    async def success_handler(**kwargs):
+        is_success = all(kwargs.values())
+        return {
+            "status": "success" if is_success else "failure",
+            "results": [
+                {"condition": condition, "output": value}
+                for condition, value in kwargs.items()
+            ],
+        }
+
+    def sick():
+        return False
+
+    def healthy():
+        return True
+
+    app = FastAPI()
+    app.add_api_route(
+        "/health", health([sick, healthy], failure_handler=success_handler)
+    )
+    with TestClient(app) as client:
+        res = client.get("/health")
+        assert res.status_code == 503
+        assert res.json() == {
+            "status": "failure",
+            "results": [
+                {"condition": "sick", "output": False},
+                {"condition": "healthy", "output": True},
+            ],
+        }
