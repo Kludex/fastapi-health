@@ -24,7 +24,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.6.1"
-fastapi = "^0.63.0"
+fastapi = ">=0.63.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
