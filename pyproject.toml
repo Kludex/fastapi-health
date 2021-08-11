@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-health"
-version = "0.2.1"
+version = "0.3.0"
 description = "Heath check on FastAPI applications."
 authors = ["Marcelo Trylesinski <marcelotryle@gmail.com>"]
 readme = "README.md"
