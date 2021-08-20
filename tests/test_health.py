@@ -134,7 +134,7 @@ def test_success_handler():
 
 
 def test_custom_output():
-    async def success_handler(**kwargs):
+    async def failure_handler(**kwargs):
         is_success = all(kwargs.values())
         return {
             "status": "success" if is_success else "failure",
@@ -152,7 +152,7 @@ def test_custom_output():
 
     app = FastAPI()
     app.add_api_route(
-        "/health", health([sick, healthy], failure_handler=success_handler)
+        "/health", health([sick, healthy], failure_handler=failure_handler)
     )
     with TestClient(app) as client:
         res = client.get("/health")
