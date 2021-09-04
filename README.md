@@ -49,7 +49,7 @@ app.add_api_route("/health", health([is_database_online]))
 
 The `health()` method receives the following parameters:
 - `conditions`: A list of callables that represents the conditions of your API, it can return either `bool` or a `dict`.
-- `success_output`: An optional callable which receives `**kwargs` and returns a dictionary that will be the content response of a successful health call.
+- `success_output`: An optional callable which receives the `conditions` results and returns a dictionary that will be the content response of a successful health call.
 - `failure_output`: An optional callable analogous to `success_output` for failure scenarios.
 - `success_status`: An integer that overwrites the default status (200) in case of success.
 - `failure_status`: An integer that overwrites the default status (503) in case of failure.
