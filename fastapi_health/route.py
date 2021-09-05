@@ -8,9 +8,11 @@ from fastapi.responses import JSONResponse
 
 async def default_handler(**kwargs) -> Dict[str, Any]:
     output = {}
-    for value in kwargs.values():
+    for key, value in kwargs.items():
         if isinstance(value, dict):
             output.update(value)
+        else:
+            output.update({key: value})
     return output
 
 

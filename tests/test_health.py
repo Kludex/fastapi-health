@@ -110,7 +110,11 @@ def test_hybrid():
     with TestClient(app) as client:
         res = client.get("/health")
         assert res.status_code == 503
-        assert res.json() == {"banana": "yes"}
+        assert res.json() == {
+            "healthy_dict": True,
+            "banana": "yes",
+            "sick": False,
+        }
 
 
 def test_success_handler():
@@ -125,7 +129,8 @@ def test_success_handler():
 
     app = FastAPI()
     app.add_api_route(
-        "/health", health([healthy, another_healthy], success_handler=success_handler)
+        "/health",
+        health([healthy, another_healthy], success_handler=success_handler),
     )
     with TestClient(app) as client:
         res = client.get("/health")
