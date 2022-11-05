@@ -80,13 +80,13 @@ class Condition(BaseModel):
     )
 
 
-@dataclass
+@dataclass(frozen=True)
 class Status:
     code: int
     name: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class HealthEndpoint:
     conditions: List[Condition] = field(default_factory=list)
     allow_version: bool = field(default=False)
