@@ -62,7 +62,7 @@ from fastapi import FastAPI
 from fastapi_health import health
 
 
-def healthy_condition():
+def pass_condition():
     return {"database": "online"}
 
 
@@ -71,7 +71,7 @@ def sick_condition():
 
 
 app = FastAPI()
-app.add_api_route("/health", health([healthy_condition, sick_condition]))
+app.add_api_route("/health", health([pass_condition, sick_condition]))
 ```
 
 This will generate a response composed by the status being 503 (default `failure_status`), because `sick_condition` returns `False`, and the JSON body `{"database": "online"}`. It's not wrong, or a bug. It's meant to be like this.

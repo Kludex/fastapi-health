@@ -25,7 +25,7 @@ classifiers = [
 ]
 license = "MIT"
 requires-python = ">=3.7"
-dependencies = ["fastapi>=0.63.0"]
+dependencies = ["fastapi>=0.85.0"]
 optional-dependencies = {}
 
 [project.urls]
