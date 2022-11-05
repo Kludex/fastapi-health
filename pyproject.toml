@@ -40,20 +40,25 @@ show_error_codes = true
 
 [tool.flake8]
 statistics = true
-max-line-length = 88
+max-line-length = 100
 ignore = ["E203", "E501", "W503"]
 per-file-ignores = ["__init__.py:F401"]
 
 [tool.black]
 target-version = ["py37"]
+line_length = 100
 
 [tool.isort]
 profile = "black"
+max_line_length = 100
 combine_as_imports = true
 
 [tool.pytest.ini_options]
 addopts = ["--strict-config", "--strict-markers"]
-filterwarnings = ["error", "ignore:'cgi' is deprecated and slated for removal in Python 3.13:DeprecationWarning"]
+filterwarnings = [
+    "error",
+    "ignore:'cgi' is deprecated and slated for removal in Python 3.13:DeprecationWarning",
+]
 
 [tool.coverage.run]
 source_pkgs = ["fastapi_health", "tests"]
