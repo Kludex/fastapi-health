@@ -53,7 +53,7 @@ combine_as_imports = true
 
 [tool.pytest.ini_options]
 addopts = ["--strict-config", "--strict-markers"]
-filterwarnings = ["error"]
+filterwarnings = ["error", "ignore:'cgi' is deprecated and slated for removal in Python 3.13:DeprecationWarning"]
 
 [tool.coverage.run]
 source_pkgs = ["fastapi_health", "tests"]
