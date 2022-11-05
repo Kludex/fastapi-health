@@ -1,166 +1,102 @@
+from typing import Any
+
+import pytest
 from fastapi import Depends, FastAPI
-from fastapi.testclient import TestClient
+from fastapi.routing import APIRoute
+from httpx import AsyncClient
 
 from fastapi_health import health
 
 
-def test_single_condition():
-    def healthy():
-        return True
-
-    app = FastAPI()
-    app.add_api_route("/health", health([healthy]))
-    with TestClient(app) as client:
-        res = client.get("/health")
-        assert res.status_code == 200
+def healthy():
+    return True
 
 
-def test_multiple_condition():
-    def healthy():
-        return True
-
-    def also_healthy():
-        return True
-
-    app = FastAPI()
-    app.add_api_route("/health", health([healthy, also_healthy]))
-    with TestClient(app) as client:
-        res = client.get("/health")
-        assert res.status_code == 200
+def another_healthy():
+    return True
 
 
-def test_sick_condition():
-    def sick():
-        return False
-
-    def healthy():
-        return True
-
-    app = FastAPI()
-    app.add_api_route("/health", health([sick, healthy]))
-    with TestClient(app) as client:
-        res = client.get("/health")
-        assert res.status_code == 503
+def sick():
+    return False
 
 
-def test_endpoint_with_dependency():
-    def healthy():
-        return True
-
-    def healthy_with_dependency(condition_banana: bool = Depends(healthy)):
-        return condition_banana
-
-    app = FastAPI()
-    app.add_api_route("/health", health([healthy_with_dependency]))
-    with TestClient(app) as client:
-        res = client.get("/health")
-        assert res.status_code == 200
+def with_dependency(condition_banana: bool = Depends(healthy)):
+    return condition_banana
 
 
-def test_coroutine_condition():
-    async def async_health():
-        return True
-
-    app = FastAPI()
-    app.add_api_route("/health", health([async_health]))
-    with TestClient(app) as client:
-        res = client.get("/health")
-        assert res.status_code == 200
+async def healthy_async():
+    return True
 
 
-def test_json_response():
-    def healthy_dict():
-        return {"potato": "yes"}
-
-    app = FastAPI()
-    app.add_api_route("/health", health([healthy_dict]))
-    with TestClient(app) as client:
-        res = client.get("/health")
-        assert res.status_code == 200
-        assert res.json() == {"potato": "yes"}
+def healthy_dict():
+    return {"potato": "yes"}
 
 
-def test_concatenate_response():
-    def healthy_dict():
-        return {"potato": "yes"}
-
-    def also_healthy_dict():
-        return {"banana": "yes"}
-
-    app = FastAPI()
-    app.add_api_route("/health", health([healthy_dict, also_healthy_dict]))
-    with TestClient(app) as client:
-        res = client.get("/health")
-        assert res.status_code == 200
-        assert res.json() == {"potato": "yes", "banana": "yes"}
+def another_health_dict():
+    return {"banana": "yes"}
 
 
-def test_hybrid():
-    def healthy_dict():
-        return True
-
-    def sick():
-        return False
-
-    def also_healthy_dict():
-        return {"banana": "yes"}
-
-    app = FastAPI()
-    app.add_api_route("/health", health([healthy_dict, also_healthy_dict, sick]))
-    with TestClient(app) as client:
-        res = client.get("/health")
-        assert res.status_code == 503
-        assert res.json() == {"banana": "yes"}
+def create_app(*args: Any, **kwargs: Any) -> FastAPI:
+    return FastAPI(routes=[APIRoute("/health", health(*args, **kwargs))])
 
 
-def test_success_handler():
-    async def success_handler(**kwargs):
-        return kwargs
-
-    def healthy():
-        return True
-
-    def another_healthy():
-        return True
-
-    app = FastAPI()
-    app.add_api_route(
-        "/health", health([healthy, another_healthy], success_handler=success_handler)
-    )
-    with TestClient(app) as client:
-        res = client.get("/health")
-        assert res.status_code == 200
-        assert res.json() == {"healthy": True, "another_healthy": True}
+async def success_handler(**kwargs):
+    return kwargs
 
 
-def test_custom_output():
-    async def failure_handler(**kwargs):
-        is_success = all(kwargs.values())
-        return {
-            "status": "success" if is_success else "failure",
-            "results": [
-                {"condition": condition, "output": value}
-                for condition, value in kwargs.items()
-            ],
-        }
+async def custom_failure_handler(**kwargs):
+    is_success = all(kwargs.values())
+    return {
+        "status": "success" if is_success else "failure",
+        "results": [
+            {"condition": condition, "output": value}
+            for condition, value in kwargs.items()
+        ],
+    }
 
-    def sick():
-        return False
 
-    def healthy():
-        return True
+healthy_app = create_app([healthy])
+multiple_healthy_app = create_app([healthy, another_healthy])
+sick_app = create_app([healthy, sick])
+with_dependency_app = create_app([with_dependency])
+healthy_async_app = create_app([healthy_async])
+healthy_dict_app = create_app([healthy_dict])
+multiple_healthy_dict_app = create_app([healthy_dict, another_health_dict])
+hybrid_app = create_app([healthy, sick, healthy_dict])
+success_handler_app = create_app([healthy], success_handler=success_handler)
+failure_handler_app = create_app(
+    [sick, healthy], failure_handler=custom_failure_handler
+)
 
-    app = FastAPI()
-    app.add_api_route(
-        "/health", health([sick, healthy], failure_handler=failure_handler)
-    )
-    with TestClient(app) as client:
-        res = client.get("/health")
-        assert res.status_code == 503
-        assert res.json() == {
-            "status": "failure",
-            "results": [
-                {"condition": "sick", "output": False},
-                {"condition": "healthy", "output": True},
-            ],
-        }
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "app, status_code, body",
+    (
+        (healthy_app, 200, {}),
+        (multiple_healthy_app, 200, {}),
+        (sick_app, 503, {}),
+        (with_dependency_app, 200, {}),
+        (healthy_async_app, 200, {}),
+        (healthy_dict_app, 200, {"potato": "yes"}),
+        (multiple_healthy_dict_app, 200, {"potato": "yes", "banana": "yes"}),
+        (hybrid_app, 503, {"potato": "yes"}),
+        (success_handler_app, 200, {"healthy": True}),
+        (
+            failure_handler_app,
+            503,
+            {
+                "status": "failure",
+                "results": [
+                    {"condition": "sick", "output": False},
+                    {"condition": "healthy", "output": True},
+                ],
+            },
+        ),
+    ),
+)
+async def test_health(app: FastAPI, status_code: int, body: dict) -> None:
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        res = await client.get("/health")
+        assert res.status_code == status_code
+        assert res.json() == body

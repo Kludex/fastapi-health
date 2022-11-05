@@ -1,43 +1,63 @@
-[tool.poetry]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = 'hatchling.build'
+
+[project]
 name = "fastapi-health"
 version = "0.4.0"
-description = "Heath check on FastAPI applications."
-authors = ["Marcelo Trylesinski <marcelotryle@gmail.com>"]
+description = "Heath check on FastAPI applications. :ambulance:"
 readme = "README.md"
-license = "MIT"
-repository = "https://github.com/Kludex/fastapi-health"
-
+authors = [{ name = "Marcelo Trylesinski", email = "marcelotryle@gmail.com" }]
 classifiers = [
-    "Topic :: Software Development :: Build Tools",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Intended Audience :: Developers",
+    "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
+license = "MIT"
+requires-python = ">=3.7"
+dependencies = ["fastapi>=0.63.0"]
+optional-dependencies = {}
 
-[tool.poetry.dependencies]
-python = "^3.6.1"
-fastapi = ">=0.63.0"
+[project.urls]
+Homepage = "https://github.com/Kludex/fastapi-health"
+Source = "https://github.com/Kludex/fastapi-health"
+Twitter = "https://twitter.com/marcelotryle"
+Funding = "https://github.com/sponsors/Kludex"
 
-[tool.poetry.dev-dependencies]
-pytest = "^5.2"
-black = "^20.8b1"
-flake8 = "^3.8.4"
-autoflake = "^1.4"
-isort = "^5.0"
-pytest-cov = "^2.10.1"
-pre-commit = "^2.9.3"
-mypy = "^0.790"
-requests = "^2.25.1"
+[tool.mypy]
+strict = true
+show_error_codes = true
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.flake8]
+statistics = true
+max-line-length = 88
+ignore = ["E203", "E501", "W503"]
+per-file-ignores = ["__init__.py:F401"]
+
+[tool.black]
+target-version = ["py37"]
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+
+[tool.pytest.ini_options]
+addopts = ["--strict-config", "--strict-markers"]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source_pkgs = ["fastapi_health", "tests"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
