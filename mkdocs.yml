@@ -1,0 +1,56 @@
+site_name: FastAPI Health
+site_description: Health check for your FastAPI application
+site_url: https://kludex.github.io/fastapi-health
+site_author: Marcelo Trylesinski
+copyright: Copyright &copy; 2022 Marcelo Trylesinski
+
+repo_name: Kludex/fastapi-health
+repo_url: https://github.com/Kludex/fastapi-health
+edit_uri: edit/main/docs/
+
+plugins:
+  - search
+  - mkdocstrings
+
+theme:
+  name: material
+  favicon: images/favicon.ico
+  logo: images/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: slate
+      primary: red
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: default
+      primary: red
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to system preference
+
+markdown_extensions:
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Home: index.md
+  - API Reference: api.md
