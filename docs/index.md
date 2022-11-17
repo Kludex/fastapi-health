@@ -68,9 +68,30 @@ Each condition is a callable, and you can even have dependencies inside of it:
     app.add_api_route("/health", health([is_redis_alive]))
     ```
 
-=== "RabbitMQ"
+=== "MongoDB"
 
     ```python
+    import asyncio
+
+    from fastapi import FastAPI, Depends
+    from fastapi_health import health
+    from motor.motor_asyncio import AsyncIOMotorClient
+    from pymongo.errors import ServerSelectionTimeoutError
+
+    # You need to implement yourself 👇
+    from app.mongodb import get_mongo
+
+
+    async def is_mongo_alive(client: AsyncIOMotorClient = Depends(get_mongo)):
+        try:
+            await asyncio.wait_for(client.server_info(), timeout=30)
+        except (ServerSelectionTimeoutError, TimeoutError):
+            return False
+        return True
+
+
+    app = FastAPI()
+    app.add_api_route("/health", health([is_mongo_alive]))
     ```
 
 You can check the [**API reference**] for more details.
