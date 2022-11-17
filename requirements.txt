@@ -18,3 +18,4 @@ httpx
 
 # Documentation
 mkdocs-material
+mkdocstrings[python]
