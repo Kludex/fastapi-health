@@ -33,6 +33,3 @@ jobs:
         run: coverage xml
       - name: Upload coverage
         uses: codecov/codecov-action@v1
-
-env:
-  GH_TOKEN: ${{ secrets.GH_TOKEN }}

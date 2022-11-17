@@ -17,4 +17,4 @@ dirty-equals
 httpx
 
 # Documentation
-git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
+mkdocs-material
