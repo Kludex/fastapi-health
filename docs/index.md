@@ -42,14 +42,30 @@ Each condition is a callable, and you can even have dependencies inside of it:
     app.add_api_route("/health", health([is_database_online]))
     ```
 
-=== "MongoDB"
-
-    ```python
-    ```
-
 === "Redis"
 
     ```python
+    import asyncio
+
+    from fastapi import FastAPI, Depends
+    from fastapi_health import health
+    from redis import ConnectionError
+    from redis.asyncio import Redis
+
+    # You need to implement yourself 👇
+    from app.redis import get_redis
+
+
+    async def is_redis_alive(client: Redis = Depends(get_redis)):
+        try:
+            await asyncio.wait_for(client.check_health(), timeout=30)
+        except (ConnectionError, RuntimeError, TimeoutError):
+            return False
+        return True
+
+
+    app = FastAPI()
+    app.add_api_route("/health", health([is_redis_alive]))
     ```
 
 === "RabbitMQ"
