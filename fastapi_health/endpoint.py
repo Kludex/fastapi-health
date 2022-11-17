@@ -185,7 +185,6 @@ class HealthEndpoint:
                     return self.fail_status
                 if check.status == self.warn_status.name:
                     warns += 1
-        print(total_checks, warns)
         if checks and warns == total_checks:
             return self.warn_status
         return self.pass_status
