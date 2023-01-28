@@ -1,6 +1,6 @@
 from inspect import Parameter, Signature
 from typing import TypeVar
-from typing import Any, Awaitable, Callable, Dict, List, Union
+from typing import Any, Awaitable, Callable, Coroutine, Dict, List, Union
 
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
@@ -32,7 +32,7 @@ def health(
     failure_handler: Callable[..., Awaitable[dict]] = default_handler,
     success_status: int = 200,
     failure_status: int = 503,
-) -> Callable[..., Awaitable[JSONResponse]]:
+) -> Callable[..., Coroutine[None, None, JSONResponse]]:
     """Create a health check route.
 
     Args:
