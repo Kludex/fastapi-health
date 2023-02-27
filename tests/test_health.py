@@ -1,4 +1,5 @@
-from typing import Any
+from typing import Any, Dict
+from functools import partial
 
 import pytest
 from fastapi import Depends, FastAPI
@@ -44,13 +45,16 @@ async def success_handler(**kwargs):
     return kwargs
 
 
+def healthy_partial(healthy: bool) -> Dict[str, bool]:
+    return {"healthy": healthy}
+
+
 async def custom_failure_handler(**kwargs):
     is_success = all(kwargs.values())
     return {
         "status": "success" if is_success else "failure",
         "results": [
-            {"condition": condition, "output": value}
-            for condition, value in kwargs.items()
+            {"condition": condition, "output": value} for condition, value in kwargs.items()
         ],
     }
 
@@ -64,9 +68,8 @@ healthy_dict_app = create_app([healthy_dict])
 multiple_healthy_dict_app = create_app([healthy_dict, another_health_dict])
 hybrid_app = create_app([healthy, sick, healthy_dict])
 success_handler_app = create_app([healthy], success_handler=success_handler)
-failure_handler_app = create_app(
-    [sick, healthy], failure_handler=custom_failure_handler
-)
+failure_handler_app = create_app([sick, healthy], failure_handler=custom_failure_handler)
+partial_healthy_app = create_app([partial(healthy_partial, healthy=True)])
 
 
 @pytest.mark.asyncio
@@ -93,10 +96,11 @@ failure_handler_app = create_app(
                 ],
             },
         ),
+        (partial_healthy_app, 200, {"healthy": True}),
     ),
 )
 async def test_health(app: FastAPI, status_code: int, body: dict) -> None:
     async with AsyncClient(app=app, base_url="http://test") as client:
         res = await client.get("/health")
-        assert res.status_code == status_code
+        assert res.status_code == status_code, res.json()
         assert res.json() == body

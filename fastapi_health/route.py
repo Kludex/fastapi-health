@@ -1,3 +1,4 @@
+import functools
 from inspect import Parameter, Signature
 from typing import TypeVar
 from typing import Any, Awaitable, Callable, Coroutine, Dict, List, Union
@@ -65,12 +66,17 @@ def health(
 
     params = []
     for condition in conditions:
+        dependency = Depends(condition)
+
+        while isinstance(condition, functools.partial):
+            condition = condition.func
+
         params.append(
             Parameter(
                 f"{condition.__name__}",
                 kind=Parameter.POSITIONAL_OR_KEYWORD,
                 annotation=bool,
-                default=Depends(condition),
+                default=dependency,
             )
         )
     endpoint.__signature__ = Signature(params)
