@@ -1,13 +1,13 @@
-from typing import Any
 from datetime import datetime
-from fastapi_health.endpoint import Condition, Check, Status
+from typing import Any
 
+import httpx
 import pytest
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 
 from fastapi_health import HealthEndpoint
-import httpx
+from fastapi_health.endpoint import Check, Condition, Status
 
 
 def healthy() -> Check:

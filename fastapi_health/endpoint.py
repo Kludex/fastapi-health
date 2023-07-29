@@ -1,14 +1,29 @@
-from dataclasses import dataclass, field
 from collections import defaultdict
-from starlette._utils import is_async_callable
-from anyio import to_thread
-import anyio
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Callable, Dict, List, DefaultDict, Optional, cast, Union, Awaitable
+from typing import Any, Awaitable, Callable, DefaultDict, Dict, List, Optional, Union, cast
 
+import anyio
+from anyio import to_thread
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
+from pydantic.version import VERSION as PYDANTIC_VERSION
+from starlette._utils import is_async_callable
+
+PYDANTIC_V2 = PYDANTIC_VERSION.startswith("2.")
+
+if PYDANTIC_V2:  # pragma: no cover
+    from pydantic import field_validator as validator
+
+else:  # pragma: no cover
+    from pydantic import validator
+
+
+def model_dump(model: BaseModel, exclude_none: bool) -> Dict[str, Any]:  # pragma: no cover
+    if PYDANTIC_V2:
+        return model.model_dump(exclude_none=exclude_none)
+    return model.dict(exclude_none=exclude_none)
 
 
 # https://inadarei.github.io/rfc-healthcheck/#name-the-checks-object-2
@@ -147,7 +162,7 @@ class HealthEndpoint:
                 checks=checks or None,
             )
             return JSONResponse(
-                content=body.dict(exclude_none=True),
+                content=model_dump(body, exclude_none=True),
                 status_code=status.code,
                 media_type="application/health+json",
             )
@@ -165,7 +180,7 @@ class HealthEndpoint:
             else:
                 result = await to_thread.run_sync(call)
             result = cast(Check, result)
-            if result.dict(exclude_none=True):
+            if model_dump(result, exclude_none=True):
                 results[name].append(result)
 
         async with anyio.create_task_group() as tg:

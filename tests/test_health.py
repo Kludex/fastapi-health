@@ -49,8 +49,7 @@ async def custom_failure_handler(**kwargs):
     return {
         "status": "success" if is_success else "failure",
         "results": [
-            {"condition": condition, "output": value}
-            for condition, value in kwargs.items()
+            {"condition": condition, "output": value} for condition, value in kwargs.items()
         ],
     }
 
@@ -64,9 +63,7 @@ healthy_dict_app = create_app([healthy_dict])
 multiple_healthy_dict_app = create_app([healthy_dict, another_health_dict])
 hybrid_app = create_app([healthy, sick, healthy_dict])
 success_handler_app = create_app([healthy], success_handler=success_handler)
-failure_handler_app = create_app(
-    [sick, healthy], failure_handler=custom_failure_handler
-)
+failure_handler_app = create_app([sick, healthy], failure_handler=custom_failure_handler)
 
 
 @pytest.mark.asyncio

@@ -1,11 +1,9 @@
 from inspect import Parameter, Signature
-from typing import TypeVar
-from typing import Any, Awaitable, Callable, Coroutine, Dict, List, Union
+from typing import Any, Awaitable, Callable, Coroutine, Dict, List, TypeVar, Union
 
 from fastapi import Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-
 
 T = TypeVar("T")
 
