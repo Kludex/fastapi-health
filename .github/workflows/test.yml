@@ -30,6 +30,6 @@ jobs:
       - name: Run tests
         run: hatch run test:run
       - name: Create report
-        run: coverage xml
+        run: coverage combine && coverage xml
       - name: Upload coverage
         uses: codecov/codecov-action@v1
