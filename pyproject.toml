@@ -5,7 +5,7 @@ build-backend = 'hatchling.build'
 
 [project]
 name = "fastapi-health"
-version = "0.4.0"
+version = "0.5.0"
 description = "Heath check on FastAPI applications. :ambulance:"
 readme = "README.md"
 authors = [{ name = "Marcelo Trylesinski", email = "marcelotryle@gmail.com" }]
