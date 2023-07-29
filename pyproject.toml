@@ -33,24 +33,37 @@ Source = "https://github.com/Kludex/fastapi-health"
 Twitter = "https://twitter.com/marcelotryle"
 Funding = "https://github.com/sponsors/Kludex"
 
+[tool.hatch.envs.test]
+dependencies = [
+  "pytest",
+  "coverage[toml]",
+  "pytest-sugar",
+  "pytest-asyncio",
+  "dirty-equals",
+  "httpx",
+]
+
+[tool.hatch.envs.test.scripts]
+run = "coverage run -m pytest"
+cov = "coverage report --show-missing --skip-covered"
+
+[[tool.hatch.envs.test.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11"]
+dependencies = ["pydantic<2", "pydantic>=2"]
+
 [tool.mypy]
 strict = true
 show_error_codes = true
 
-[tool.flake8]
-statistics = true
-max-line-length = 100
-ignore = ["E203", "E501", "W503"]
-per-file-ignores = ["__init__.py:F401"]
+[tool.ruff]
+line-length = 100
+extend-select = ['Q', 'RUF100', 'C90', 'UP', 'I', 'T']
+extend-ignore = ['E501']
+target-version = "py38"
 
 [tool.black]
 target-version = ["py37"]
 line_length = 100
-
-[tool.isort]
-profile = "black"
-max_line_length = 100
-combine_as_imports = true
 
 [tool.pytest.ini_options]
 addopts = ["--strict-config", "--strict-markers"]

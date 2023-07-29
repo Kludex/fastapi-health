@@ -1,20 +1,11 @@
 -e .
 
 # Linter & Formatter
-isort
-flake8
+ruff
 black
 mypy
-pyproject-flake8
 pre-commit
-
-# Tests
 coverage[toml]
-pytest
-pytest-sugar
-pytest-asyncio
-dirty-equals
-httpx
 
 # Documentation
 mkdocs-material
