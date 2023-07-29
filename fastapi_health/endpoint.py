@@ -13,14 +13,14 @@ from starlette._utils import is_async_callable
 
 PYDANTIC_V2 = PYDANTIC_VERSION.startswith("2.")
 
-if PYDANTIC_V2:
+if PYDANTIC_V2:  # pragma: no cover
     from pydantic import field_validator as validator
 
-else:
+else:  # pragma: no cover
     from pydantic import validator
 
 
-def model_dump(model: BaseModel, exclude_none: bool) -> Dict[str, Any]:
+def model_dump(model: BaseModel, exclude_none: bool) -> Dict[str, Any]:  # pragma: no cover
     if PYDANTIC_V2:
         return model.model_dump(exclude_none=exclude_none)
     return model.dict(exclude_none=exclude_none)
