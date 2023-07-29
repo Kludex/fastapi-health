@@ -75,6 +75,7 @@ filterwarnings = [
 [tool.coverage.run]
 source_pkgs = ["fastapi_health", "tests"]
 branch = true
+parallel = true
 
 [tool.coverage.report]
 show_missing = true
