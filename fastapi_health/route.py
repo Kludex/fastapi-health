@@ -6,6 +6,8 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 T = TypeVar("T")
+HealthcheckReturn = Union[Dict[str, Any], bool]
+ConditionFunc = Callable[..., Union[HealthcheckReturn, Awaitable[HealthcheckReturn]]]
 
 
 async def default_handler(**kwargs: T) -> Dict[str, T]:
@@ -24,7 +26,7 @@ async def default_handler(**kwargs: T) -> Dict[str, T]:
 
 
 def health(
-    conditions: List[Callable[..., Union[Dict[str, Any], bool]]],
+    conditions: List[ConditionFunc],
     *,
     success_handler: Callable[..., Awaitable[dict]] = default_handler,
     failure_handler: Callable[..., Awaitable[dict]] = default_handler,
