@@ -1,11 +1,13 @@
 from typing import Any
 
+import httpx
 import pytest
 from fastapi import Depends, FastAPI
 from fastapi.routing import APIRoute
 from httpx import AsyncClient
 
 from fastapi_health import health
+
 
 
 def healthy():
@@ -92,8 +94,14 @@ failure_handler_app = create_app([sick, healthy], failure_handler=custom_failure
         ),
     ),
 )
+
 async def test_health(app: FastAPI, status_code: int, body: dict) -> None:
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        res = await client.get("/health")
-        assert res.status_code == status_code
-        assert res.json() == body
+    transport = httpx.ASGITransport(app=app)
+
+    async with AsyncClient(
+        transport=transport,
+        base_url="http://test",
+    ) as client:
+        response = await client.get("/health")
+        assert response.status_code == status_code
+        assert response.json() == body
